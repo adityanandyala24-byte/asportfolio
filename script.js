@@ -5,8 +5,6 @@ const Portfolio = {
         this.initNavigation();
         this.initScrollAnimations();
         this.initContactForm();
-        this.initCustomCursor();
-        this.initTypingEffect();
     },
 
     cacheDOM() {
@@ -162,22 +160,8 @@ const Portfolio = {
 
     initProjectCardAnimations() {
         const projectCards = document.querySelectorAll('.project-card');
-        const projectObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }, index * 100);
-                }
-            });
-        }, { threshold: 0.1 });
-
         projectCards.forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = 'all 0.6s ease';
-            projectObserver.observe(card);
+            card.style.opacity = '1';
         });
     },
 
@@ -228,11 +212,11 @@ const Portfolio = {
             position: fixed;
             top: 100px;
             right: 20px;
-            background: ${type === 'success' ? '#10b981' : '#ef4444'};
-            color: white;
+            background: ${type === 'success' ? '#ffffff' : '#ef4444'};
+            color: ${type === 'success' ? '#0a1628' : 'white'};
             padding: 1rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             z-index: 10000;
             display: flex;
             align-items: center;
@@ -247,7 +231,7 @@ const Portfolio = {
         closeBtn.style.cssText = `
             background: none;
             border: none;
-            color: white;
+            color: ${type === 'success' ? '#0a1628' : 'white'};
             font-size: 1.5rem;
             cursor: pointer;
             padding: 0;
@@ -271,60 +255,6 @@ const Portfolio = {
                 removeNotification();
             }
         }, 5000);
-    },
-
-    initTypingEffect() {
-        const titleElement = document.querySelector('.home-title');
-        if (!titleElement) return;
-
-        const originalText = titleElement.textContent;
-        let i = 0;
-
-        titleElement.innerHTML = '';
-
-        const type = () => {
-            if (i < originalText.length) {
-                titleElement.innerHTML += originalText.charAt(i);
-                i++;
-                setTimeout(type, 80);
-            }
-        };
-
-        type();
-    },
-
-    initCustomCursor() {
-        if (window.innerWidth <= 768) return;
-
-        const cursor = document.createElement('div');
-        cursor.className = 'custom-cursor';
-        cursor.style.cssText = `
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            background: rgba(16, 185, 129, 0.5);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.1s ease;
-            mix-blend-mode: difference;
-        `;
-        document.body.appendChild(cursor);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX - 10 + 'px';
-            cursor.style.top = e.clientY - 10 + 'px';
-        });
-
-        document.querySelectorAll('a, button, .project-card').forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                cursor.style.transform = 'scale(2)';
-            });
-
-            element.addEventListener('mouseleave', () => {
-                cursor.style.transform = 'scale(1)';
-            });
-        });
     },
 
     debounce(func, wait) {

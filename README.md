@@ -1,24 +1,23 @@
 # A.S.Naidu Portfolio
 
-A modern, responsive portfolio website featuring an obsidian dark theme with emerald green accents.
+A minimal, clean portfolio website featuring a dark navy blue and white color scheme.
 
 ## Features
 
-- **Obsidian Theme**: Sophisticated dark color palette with deep blacks and emerald accents
-- **Smooth Animations**: Fade-in effects, typing animations, and scroll-triggered reveals
-- **3D Achievement Carousel**: Interactive slideshow with 3D transforms
+- **Minimal Design**: Clean dark navy blue theme with white accents
 - **Responsive Design**: Fully optimized for mobile, tablet, and desktop devices
-- **Performance Optimized**: Debounced scroll events and intersection observers
+- **Smooth Slideshow**: Simple achievement carousel with fade transitions
+- **Performance Optimized**: Lightweight animations and efficient code
 - **Modern JavaScript**: Object-oriented architecture with modular code organization
 - **Contact Form**: Built-in validation with user-friendly notifications
 
 ## Color Palette
 
-- Primary Background: #0B0B0F (Obsidian Black)
-- Secondary Background: #1A1A24 (Obsidian Dark)
-- Accent Color: #10B981 (Emerald Green)
-- Text Primary: #E5E7EB (Light Gray)
-- Text Secondary: #9CA3AF (Medium Gray)
+- Primary Background: #0a1628 (Navy Dark)
+- Secondary Background: #132a47 (Navy Medium)
+- Accent Color: #ffffff (White)
+- Text Primary: #ffffff (White)
+- Text Secondary: rgba(255, 255, 255, 0.7)
 
 ## Technologies
 
