@@ -1,193 +1,87 @@
 const Portfolio = {
     init() {
         this.cacheDOM();
-        this.initSlideshow();
-        this.initNavigation();
-        this.initScrollAnimations();
-        this.initContactForm();
+        this.attachEventListeners();
+        this.handleScroll();
     },
 
     cacheDOM() {
-        this.navbar = document.getElementById('navbar');
         this.hamburger = document.getElementById('hamburger');
-        this.navMenu = document.getElementById('nav-menu');
-        this.navLinks = document.querySelectorAll('.nav-link');
-        this.sections = document.querySelectorAll('section');
+        this.navbar = document.getElementById('navbar');
+        this.tabBtns = document.querySelectorAll('.tab-btn');
+        this.sections = document.querySelectorAll('.content-section');
         this.contactForm = document.getElementById('contactForm');
-        this.slides = document.querySelectorAll('.slide');
-        this.prevBtn = document.getElementById('prevBtn');
-        this.nextBtn = document.getElementById('nextBtn');
-        this.indicators = document.querySelectorAll('.indicator');
-        this.currentSlide = 0;
     },
 
-    initSlideshow() {
-        this.updateSlideshow();
-
-        this.prevBtn.addEventListener('click', () => this.prevSlide());
-        this.nextBtn.addEventListener('click', () => this.nextSlide());
-
-        this.indicators.forEach((indicator, index) => {
-            indicator.addEventListener('click', () => {
-                this.currentSlide = index;
-                this.updateSlideshow();
-            });
+    attachEventListeners() {
+        window.addEventListener('scroll', () => this.handleScroll());
+        this.tabBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleTabClick(e));
         });
-
-        setInterval(() => this.nextSlide(), 5000);
+        if (this.contactForm) {
+            this.contactForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
+        }
+        if (this.hamburger) {
+            this.hamburger.addEventListener('click', () => this.toggleHamburger());
+        }
     },
 
-    updateSlideshow() {
-        this.slides.forEach((slide, index) => {
-            slide.classList.remove('center', 'left', 'right', 'hidden');
+    handleTabClick(e) {
+        e.preventDefault();
+        const targetId = e.target.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
 
-            if (index === this.currentSlide) {
-                slide.classList.add('center');
-            } else if (index === (this.currentSlide - 1 + this.slides.length) % this.slides.length) {
-                slide.classList.add('left');
-            } else if (index === (this.currentSlide + 1) % this.slides.length) {
-                slide.classList.add('right');
-            } else {
-                slide.classList.add('hidden');
-            }
-        });
-
-        this.indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === this.currentSlide);
-        });
+        if (targetSection) {
+            this.updateActiveTab(e.target);
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
     },
 
-    nextSlide() {
-        this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-        this.updateSlideshow();
-    },
-
-    prevSlide() {
-        this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
-        this.updateSlideshow();
-    },
-
-    initNavigation() {
-        window.addEventListener('scroll', this.debounce(() => {
-            if (window.scrollY > 50) {
-                this.navbar.classList.add('scrolled');
-            } else {
-                this.navbar.classList.remove('scrolled');
-            }
-            this.updateActiveNav();
-        }, 10));
-
-        this.hamburger.addEventListener('click', () => {
-            this.navMenu.classList.toggle('active');
-            this.hamburger.classList.toggle('active');
-        });
-
-        this.navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href');
-                const targetSection = document.querySelector(targetId);
-
-                if (targetSection) {
-                    const offsetTop = targetSection.offsetTop - 80;
-                    window.scrollTo({
-                        top: offsetTop,
-                        behavior: 'smooth'
-                    });
-                }
-
-                this.navMenu.classList.remove('active');
-                this.hamburger.classList.remove('active');
-            });
-        });
-    },
-
-    updateActiveNav() {
-        const scrollPosition = window.scrollY + 100;
+    handleScroll() {
+        let currentSection = '';
 
         this.sections.forEach(section => {
-            const sectionTop = section.offsetTop;
+            const sectionTop = section.offsetTop - 100;
             const sectionHeight = section.offsetHeight;
-            const sectionId = section.getAttribute('id');
 
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                this.navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${sectionId}`) {
-                        link.classList.add('active');
-                    }
-                });
+            if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+
+        this.tabBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('href') === `#${currentSection}`) {
+                btn.classList.add('active');
             }
         });
     },
 
-    initScrollAnimations() {
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animated');
-
-                    if (entry.target.classList.contains('skills-section')) {
-                        this.animateSkillBars();
-                    }
-                }
-            });
-        }, observerOptions);
-
-        this.sections.forEach(section => {
-            section.classList.add('animate-on-scroll');
-            observer.observe(section);
-        });
-
-        this.initProjectCardAnimations();
+    updateActiveTab(activeBtn) {
+        this.tabBtns.forEach(btn => btn.classList.remove('active'));
+        activeBtn.classList.add('active');
     },
 
-    animateSkillBars() {
-        const progressBars = document.querySelectorAll('.progress-bar');
+    handleFormSubmit(e) {
+        e.preventDefault();
 
-        progressBars.forEach(bar => {
-            const targetWidth = bar.getAttribute('data-width');
-            setTimeout(() => {
-                bar.style.width = targetWidth;
-            }, 500);
-        });
-    },
+        const formData = new FormData(this.contactForm);
+        const name = formData.get('name');
+        const email = formData.get('email');
+        const message = formData.get('message');
 
-    initProjectCardAnimations() {
-        const projectCards = document.querySelectorAll('.project-card');
-        projectCards.forEach(card => {
-            card.style.opacity = '1';
-        });
-    },
+        if (!name || !email || !message) {
+            this.showNotification('Please fill in all fields', 'error');
+            return;
+        }
 
-    initContactForm() {
-        this.contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+        if (!this.isValidEmail(email)) {
+            this.showNotification('Please enter a valid email address', 'error');
+            return;
+        }
 
-            const formData = new FormData(this.contactForm);
-            const name = formData.get('name');
-            const email = formData.get('email');
-            const subject = formData.get('subject');
-            const message = formData.get('message');
-
-            if (!name || !email || !subject || !message) {
-                this.showNotification('Please fill in all fields', 'error');
-                return;
-            }
-
-            if (!this.isValidEmail(email)) {
-                this.showNotification('Please enter a valid email address', 'error');
-                return;
-            }
-
-            this.showNotification('Message sent successfully! I will get back to you soon.', 'success');
-            this.contactForm.reset();
-        });
+        this.showNotification('Message sent successfully! I will get back to you soon.', 'success');
+        this.contactForm.reset();
     },
 
     isValidEmail(email) {
@@ -257,16 +151,8 @@ const Portfolio = {
         }, 5000);
     },
 
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
+    toggleHamburger() {
+        this.hamburger.classList.toggle('active');
     }
 };
 
